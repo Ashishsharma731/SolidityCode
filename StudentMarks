@@ -1,0 +1,101 @@
+// SPDX-License-Identifier: GPL-3.0
+pragma solidity ^0.8.14;
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+// Write a solidity smart contract which will store the marks of a student in a given subject.
+// Your smart contract should have the following:
+//1.A struct which stores the string subject and marks and uint.
+//2.There would be a list of marks declared which will store marks for different subjects.
+//3.A function to add another entry to the list of marks.
+// The function will take subject and marks as an argument and store it in the list.
+// You can attempt this exercise online at remix IDE.
+
+contract Student
+{
+    using Counters for Counters.Counter;
+    Counters.Counter private studentId;
+    Counters.Counter private subjectId;
+    Counters.Counter private markId;
+
+    struct StudentStruct 
+    {
+        uint id;
+        string name;
+    }
+
+    struct SubjectStruct 
+    {
+        uint id;
+        string[] name;
+    }
+
+    struct MarkStruct 
+    {
+        uint id;
+        uint subjectId;
+        uint studentId;
+        uint[] marks;
+    }
+    // MarkStruct public markstruct;
+
+    mapping(uint => StudentStruct) public Students;
+    mapping(uint => SubjectStruct) public Subjects;
+    mapping(uint => MarkStruct) public Marks;
+
+    function addStudent (string memory _name) public 
+    {
+        studentId.increment();
+        uint id = studentId.current();
+        Students[id] = StudentStruct(
+            id,
+            _name
+        );
+    } 
+
+    function addSubject (string[] memory _name) public 
+    {
+        subjectId.increment();
+        uint id = subjectId.current();
+        Subjects[id].id = id;
+        for (uint i; i<_name.length;i++)
+        {
+            Subjects[id].name.push(_name[i]);
+        }
+    } 
+    
+    function addMarks (uint _studenId, uint _subjectId, uint[] memory _marks) public 
+    {
+        markId.increment();
+        uint id = markId.current();
+        Marks[id].id = id;
+        Marks[id].studentId = _studenId;
+        Marks[id].subjectId = _subjectId;
+        for(uint i; i< _marks.length; i++)
+        {
+            Marks[id].marks.push(_marks[i]);
+        }
+    } 
+    
+    function getStudentMarks (uint _studenId) public view returns(uint)
+    
+    {
+        uint total;
+        MarkStruct memory marks = Marks[_studenId];
+        for (uint i = 0; i < marks.marks.length; i ++)
+        {
+            total += marks.marks[i];
+        }
+        return ((total*100)/500);
+    } 
+
+    function marksonly(uint id)public view returns(uint[]memory)
+    {
+        return (Marks[id].marks);
+    }
+
+    function table(uint id) public view returns(string memory,string[]memory,uint[]memory)
+    {
+        return(Students[id].name, Subjects[id].name, Marks[id].marks);
+    }
+    
+}
